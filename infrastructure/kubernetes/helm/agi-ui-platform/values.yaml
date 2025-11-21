@@ -1,0 +1,121 @@
+# Configuration globale
+global:
+  domain: agi-ui-platform.com
+  environment: production
+  
+# Frontend (Next.js)
+frontend:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: ghcr.io/your-org/agi-ui-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: app.agi-ui-platform.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: frontend-tls
+        hosts:
+          - app.agi-ui-platform.com
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+  env:
+    - name: NEXT_PUBLIC_VLA_SERVICE_URL
+      value: "http://vla-service:8000"
+    - name: NODE_ENV
+      value: "production"
+
+# VLA Service (Python FastAPI)
+vla-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: ghcr.io/your-org/agi-ui-vla-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 75
+  env:
+    - name: ENVIRONMENT
+      value: "production"
+    - name: REDIS_URL
+      value: "redis://redis-master:6379"
+  secrets:
+    - name: OPENAI_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: agi-ui-secrets
+          key: openai-api-key
+    - name: ANTHROPIC_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: agi-ui-secrets
+          key: anthropic-api-key
+    - name: GOOGLE_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: agi-ui-secrets
+          key: google-api-key
+
+# Redis (Cache)
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: true
+    password: "changeme"
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+  replica:
+    replicaCount: 2
+
+# Monitoring
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
+
+# Security
+security:
+  networkPolicies:
+    enabled: true
+  podSecurityPolicy:
+    enabled: true
