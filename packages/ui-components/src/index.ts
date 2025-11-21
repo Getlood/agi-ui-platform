@@ -8,9 +8,16 @@
 // Atoms
 export { AgiButton } from './atoms/Button.js';
 export { AgiInput } from './atoms/Input.js';
+export { AgiBadge } from './atoms/Badge.js';
+export { AgiSpinner } from './atoms/Spinner.js';
 
 // Molecules
 export { AgiCard } from './molecules/Card.js';
+
+// Organisms
+export { AgiDataTable } from './organisms/DataTable.js';
+export { AgiModal } from './organisms/Modal.js';
+export { AgiSidebar } from './organisms/Sidebar.js';
 
 // Metadata pour le VLA
 export const COMPONENT_METADATA = {
@@ -90,3 +97,6 @@ export function getComponentMetadata(tagName: string) {
 export function getAllComponents() {
   return Object.keys(COMPONENT_METADATA);
 }
+
+// Version
+export const VERSION = '2.0.0';
