@@ -1,0 +1,27 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd apps/frontend && pnpm install && pnpm build",
+  "devCommand": "cd apps/frontend && pnpm dev",
+  "installCommand": "pnpm install",
+  "framework": null,
+  "outputDirectory": "apps/frontend/.next",
+  "env": {
+    "NEXT_PUBLIC_VLA_SERVICE_URL": "@vla-service-url",
+    "OPENAI_API_KEY": "@openai-api-key",
+    "ANTHROPIC_API_KEY": "@anthropic-api-key",
+    "GOOGLE_API_KEY": "@google-api-key"
+  },
+  "build": {
+    "env": {
+      "OPENAI_API_KEY": "@openai-api-key",
+      "ANTHROPIC_API_KEY": "@anthropic-api-key",
+      "GOOGLE_API_KEY": "@google-api-key"
+    }
+  },
+  "regions": ["iad1"],
+  "functions": {
+    "apps/frontend/src/app/**/*.tsx": {
+      "maxDuration": 30
+    }
+  }
+}
